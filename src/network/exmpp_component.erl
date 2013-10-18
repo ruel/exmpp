@@ -375,6 +375,11 @@ session_established({send_packet, Packet}, _From,
 %% ---
 %% Receive packets
 %% When logged in we dispatch the event we receive
+%% Dispatch incoming messages (routes)
+session_established(#xmlstreamelement{element=#xmlel{name=route, children=[#xmlel{name=message, attrs=Attrs}=MessageElement|_]}}, 
+      State = #state{connection = _Module, connection_ref = _ConnRef}) ->
+    process_message(State#state.client_pid, Attrs, MessageElement),
+    {next_state, session_established, State};
 %% Dispatch incoming presence packets
 session_established(#xmlstreamelement{element=#xmlel{name=presence, attrs=Attrs}=PresenceElement},
 	  State = #state{connection = _Module, connection_ref = _ConnRef}) ->
